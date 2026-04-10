@@ -16,8 +16,11 @@ jobs:
             typst-version: 0.14.x
         - name: Create output folder
           run: mkdir compiled
-        - name: Compile report
-          run: typst compile ./docs/report/report.typ ./compiled/report.pdf --root ./
+        - name: Compile reports
+          run: |
+            typst compile ./docs/report/reportAnd.typ ./compiled/reportAnd.pdf --root ./
+            typst compile ./docs/report/reportLrn.typ ./compiled/reportLrn.pdf --root ./
+            typst compile ./docs/report/reportMtt.typ ./compiled/reportMtt.pdf --root ./
         - name: Compile presentation
           run: typst compile ./docs/presentation/presentation.typ ./compiled/presentation.pdf --root ./
         - name: Upload artifact
@@ -43,5 +46,7 @@ jobs:
           uses: softprops/action-gh-release@v2
           with: 
             files: |
-              ./CompiledPDF/report.pdf
+              ./CompiledPDF/reportAnd.pdf
+              ./CompiledPDF/reportLrn.pdf
+              ./CompiledPDF/reportMtt.pdf
               ./CompiledPDF/presentation.pdf

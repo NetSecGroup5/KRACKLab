@@ -1,6 +1,6 @@
 #import "./common.typ": course, mainColor, university, date, vulnName, labNumber, linkColor, authors
 
-#let firstPage(title) = {
+#let firstPage(title,student) = {
   show link: set text(fill: linkColor)
   set document(
     title: [#title - #course - #university],
@@ -37,6 +37,7 @@
               left
             }
           },
+          [*Student*], [#student.name #student.surname  (#student.stid)],
           [*Team members*],[#authors.andrea.name #authors.andrea.surname (#authors.andrea.stid)],
           [],[#authors.lorenzo.name #authors.lorenzo.surname (#authors.lorenzo.stid)],
           [], [#authors.matteo.name #authors.matteo.surname (#authors.matteo.stid)],
