@@ -74,7 +74,7 @@ This repository contains all the files, reports and procedure that were used dur
 - Install packages ```xclip``` ```wireshark``` (the first one needed for the python script, the other for performing analysis)
 - Open wireshark with
     ```sudo wireshark```
-  Go to ```Edit > Preferences > Protocols > IEEE 802.11 > Decryption keys > new field > Key Type``` select ```wpa-pwd`` and write ```abcdefgh:testnetwork``` as the key value.
+  Go to ```Edit > Preferences > Protocols > IEEE 802.11 > Decryption keys > new field > Key Type``` select ```wpa-pwd``` and write ```abcdefgh:testnetwork``` as the key value.
   
   You will be able to set the CCMP Packet Number column after starting receiving packets: you need to select a packet, select ```IEEE 802.11 QoS Data``` in the package info,
   next go to ```CCMP parameters > CCMP Ext. Initialization Vector```, right click and fix the field as a column.
