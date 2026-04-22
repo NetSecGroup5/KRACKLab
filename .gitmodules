@@ -1,0 +1,3 @@
+[submodule "lab/ex2/krackattacks-script"]
+	path = lab/ex2/krackattacks-script
+	url = https://github.com/vanhoefm/krackattacks-scripts
