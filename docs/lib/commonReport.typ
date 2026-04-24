@@ -104,7 +104,7 @@
     set text(size: 1.5em)
     pagebreak()
     h
-    v(1em)
+    v(0.25em)
   }
 
   set page(
