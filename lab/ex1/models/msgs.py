@@ -26,7 +26,7 @@ class EncMSG:
         return (
             f"DATA PACKET\n"
             f"--{status}--\n"
-            f"Nonce used: {self.nonce}\n"
+            f"Nonce used: {self.nonce:#010x}\n"
             f"Payload: {self.payload}\n"
         )
 

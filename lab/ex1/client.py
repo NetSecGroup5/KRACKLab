@@ -20,6 +20,7 @@ class ClientSocket:
         self._dst = []
         self._repl = -1
         self._msgcount = 0
+        self._installed_nonce = 1
         self._state = CState.SEARCHING
 
         print(f"IP:{addr}")
@@ -37,10 +38,12 @@ class ClientSocket:
             if self._msgcount > 3 :
                 print("Installing PTK & GTK\n")
                 self._state = CState.INSTALLED
+                self._installed_nonce = 1
         else:
-            msg = EncMSG("KRACKISREAL",0)
+            msg = EncMSG("KRACKISREAL",self._installed_nonce)
             self.__send_msg(msg)
             print(msg.format_msg(send=True))
+            self._installed_nonce +=1
 
     def receive(self,timeout=None):
         if self._state is CState.TERMINATED : return
@@ -62,6 +65,9 @@ class ClientSocket:
                     self.__send_msg(msg)
                     self._dst = addr
                     self._state = CState.SEARCHING
+                
+                case DassMSG() if self._state is not CState.INSTALLED:
+                    return
 
                 case CloseMSG():
                     print(msg)
@@ -78,11 +84,12 @@ class ClientSocket:
         self._repl = -1
         self._msgcount = 0
         msg = AssMSG()
-        if check_udp_port('127.0.0.1', 6000):
+        if self.__check_udp_port('127.0.0.1', 6000):
             self._dst = ['127.0.0.1', 6000] # in order to fake mitm at the beginning
             self.__send_msg(msg)
-        self._dst = ['127.0.0.1', 5001]
-        self.__send_msg(msg)
+        else:
+            self._dst = ['127.0.0.1', 5001]
+            self.__send_msg(msg)
     
     def get_state(self):
         return self._state
@@ -99,28 +106,29 @@ class ClientSocket:
         return (msg,addr)
     
     def __send_msg(self, msg):
-        self._c.sendto(pickle.dumps(msg), (self._dst[0], self._dst[1]))
+        serialized_msg = pickle.dumps(msg)
+        self._c.sendto(serialized_msg, (self._dst[0], self._dst[1]))
 
     def __generate_nonce(self,empty):
         characters = string.ascii_letters + string.digits
         return ''.join(random.choice(characters) if empty else "0" for i in range(16))
 
-def check_udp_port(ip, port, timeout=2):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.settimeout(timeout)
-    try:
-        sock.sendto(b'', (ip, port))
-        data, addr = sock.recvfrom(1024)
-        return True # Open (Received Response)
-    except socket.timeout:
-        return None # Open | Filtered (No Response)   
-    except ConnectionResetError:
-        return False # Closed (ICMP Unreachable)
-    except Exception as e:
-        print(f"Error: {e}")
-        return False
-    finally:
-        sock.close()
+    def __check_udp_port(self, ip, port, timeout=2):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.settimeout(timeout)
+        try:
+            sock.sendto(b'', (ip, port))
+            data, addr = sock.recvfrom(1024)
+            return True # Open (Received Response)
+        except socket.timeout:
+            return None # Open | Filtered (No Response)   
+        except ConnectionResetError:
+            return False # Closed (ICMP Unreachable)
+        except Exception as e:
+            print(f"Error: {e}")
+            return False
+        finally:
+            sock.close()
     
 def main():
     try:

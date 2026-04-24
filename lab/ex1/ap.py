@@ -81,7 +81,6 @@ class APSocket:
             if type(msg) is AssMSG:
                 self._dst = addr
                 self._state = APState.READY
-                print(self._dst)
                 return True
             return False
         except socket.timeout:
@@ -102,13 +101,12 @@ class APSocket:
         return (msg,addr)
 
     def __send_msg(self, msg):
-        self._ap.sendto(pickle.dumps(msg), (self._dst[0], self._dst[1]))
+        serialized_msg = pickle.dumps(msg)
+        self._ap.sendto(serialized_msg, (self._dst[0], self._dst[1]))
     
     def __generate_nonce(self,empty):
         characters = string.ascii_letters + string.digits
         return ''.join(random.choice(characters) if empty else "0" for i in range(16))
-
-
 
 def main():
     try:
