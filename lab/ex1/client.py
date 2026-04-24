@@ -84,7 +84,7 @@ class ClientSocket:
         self._repl = -1
         self._msgcount = 0
         msg = AssMSG()
-        if self.__check_udp_port('127.0.0.1', 6000) is not False:
+        if self.__check_udp_port('127.0.0.1', 6000) == True:
             self._dst = ['127.0.0.1', 6000] # in order to fake mitm at the beginning
             self.__send_msg(msg)
         else:
