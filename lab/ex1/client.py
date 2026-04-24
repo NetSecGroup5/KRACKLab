@@ -155,7 +155,7 @@ def main():
                     print("Sending some data to AP...")
                     Client.send(data=True)
                     print("Listening for some messages...")
-                    Client.receive(timeout=5) # listen for some time
+                    Client.receive(timeout=10) # listen for some time
 
     except KeyboardInterrupt:
         print("Interruption detected by user.")
