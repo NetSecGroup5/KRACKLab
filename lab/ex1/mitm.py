@@ -82,7 +82,7 @@ class MitMSocket():
                 case _: # drop the packet
                     log("Out of interested packet detected\n Dropping...\n", WARNING)
         except ConnectionResetError:
-            log(f"Failed to contact the {"Client" if addr == AP else "AP"}\n",ERROR)
+            log(f"Failed to contact the {"Client" if self._dst == CLIENT else "AP"}\n",ERROR)
             exit(1)
         except socket.timeout:
             log("Nothing received\n Retrying...\n",WARNING)

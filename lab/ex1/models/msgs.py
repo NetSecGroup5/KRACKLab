@@ -1,3 +1,5 @@
+from datetime import datetime
+
 class HandshakeMSG:
     def __init__(self, repl, nonce, key, number):
         self.number = number
@@ -22,6 +24,7 @@ class EncMSG:
     def __init__(self,payload,nonce):
         self.nonce=nonce
         self.payload=payload
+        self.time = datetime.now().strftime('[%H:%M:%S] ')
 
     def __str__(self):
         return "EncMSG"
@@ -32,6 +35,7 @@ class EncMSG:
             f"{self.__str__()} // {status}\n"
             f"Nonce used: {self.nonce:#010x}\n"
             f"Payload: {self.payload}\n"
+            f"Time: {self.time}"
         )
 
 class AssMSG: # ass requestS

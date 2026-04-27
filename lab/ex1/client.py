@@ -86,7 +86,7 @@ class ClientSocket:
         self._repl = -1
         self._msgcount = 0
         msg = AssMSG()
-        if self.__check_udp_port('127.0.0.1', 6000) == True:
+        if self.__check_udp_port('127.0.0.1', 6000) != False:
             self._dst = ['127.0.0.1', 6000] # in order to fake mitm at the beginning
             self.__send_msg(msg)
         else:
@@ -159,7 +159,7 @@ def main():
                     log("Sending some data to AP...",showtime=False)
                     Client.send(data=True)
                     log("Listening for some messages...")
-                    log(f"For {CLIENT_LISTEN_TIME} seconds", DEBUG)
+                    log(f"For {CLIENT_LISTEN_TIME} seconds\n", DEBUG)
                     Client.receive(timeout=CLIENT_LISTEN_TIME) # listen for some time
 
     except KeyboardInterrupt:
