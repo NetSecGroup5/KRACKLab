@@ -7,13 +7,18 @@ COLORCODES = {  "gray"  : "\033[0;90m",
                 "red"   : "\033[0;31m" }
 
 def log(msg,level=INFO, showtime=True):
-	color = ""
-	if level == DEBUG : 
-		color= "gray"
-		showtime = False
-	if level == WARNING: color="orange"
-	if level == ERROR: 
-		color="red" 
-		showtime = False
-	if level == WATCH: color="green"
+	match color:
+		case 0: # debug
+			color= "gray"
+			showtime = False
+		case 2: # watch
+			color="green"
+		case 3: # warning
+			color="orange"
+		case 4: # error
+			color="red" 
+			showtime = False
+		case _:
+			color = ""
+
 	print (f"{datetime.now().strftime('[%H:%M:%S] ') if showtime else ""}{COLORCODES.get(color, "") + msg + "\033[1;0m"}")
