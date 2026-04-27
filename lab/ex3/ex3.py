@@ -137,11 +137,11 @@ atexit.register(exit)
 #STEP DICTIONARY
 stepDictionary: dict[int,stepInfo] = {
         1: stepInfo("Network topology (1/3)", 1, "For this exercise, we're going to need:\n- An access point\n- A station\n\nLike the previous exercise, we're going to create this topology using mininet wifi.\nAfter clicking the button a picture of the topology should appear", None, None, None, True, "Start mininet", topology),
-        2: stepInfo("Network topology (2/3)", 2, "Click the button to open a terminal within the AP. Start it by running hostapd with this command:\n\n./hostapd hostapd.conf\n\n", None, None, None, True, "Open terminal on AP", lambda: openTerminal(False, 2, "AP")),
-        3: stepInfo("Network topology (3/3)", 3, "Click the button to upen a terminal within the station. After that, use the following commands to:\n\n1 - Move within the correct context:\n  cd ../ex2/krackattack-scripts/krackattack\n\n 2 - Activate the python virtual environment:\n  source venv/bin/activate\n\n3 - Run wpa_supplicant wrapped in the attack script:\n  ./krack_ft.py ../../../wpa_supp -i sta1-wlan0 -c ../../../ex3/supplicant.conf\n\nAfter a brief moment it should connect to the AP", None, None, None, True, "Open terminal on station", lambda: openTerminal(True, 3, "STA - WPA_SUPPLICANT")),
+        2: stepInfo("Network topology (2/3)", 2, "Click the button to open a terminal within the AP. Start it by running hostapd with this command:\n\n  ./hostapd hostapd.conf\n\n", None, None, None, True, "Open terminal on AP", lambda: openTerminal(False, 2, "AP")),
+        3: stepInfo("Network topology (3/3)", 3, "Click the button to open a terminal within the station. After that, use the following commands to:\n\n1 - Move within the correct context:\n  cd krackattack-scripts/krackattack\n\n 2 - Activate the python virtual environment:\n  source venv/bin/activate\n\n3 - Run wpa_supplicant wrapped in the attack script:\n  python3 ./krack_ft.py ../../wpa_supp -i sta1-wlan0 -c ../../supplicant.conf\n\nAfter a brief moment it should connect to the AP", None, None, None, True, "Open terminal on station", lambda: openTerminal(True, 3, "STA - WPA_SUPPLICANT")),
     4: stepInfo("Monitor traffic", 4,"Click the button to open a monitoring interface and sniff the traffic with wireshark", None, None, None, True, "Open wireshark", monitoring),
     5: stepInfo("Trigger FT handshake", 5, "Open a new terminal on the station and manually cause the station to roam.\nUse the command\n  ./wpa_cli\nthen type\n  status\nto view informations about the connection. Then run\n  roam 02:11:11:11:11:11\nto trigger the FT handshake. If all went well, you should see the attack script re-sending the\nReassociation Request over and over in wireshark", None, None, None, True, "Open terminal on station", lambda: openTerminal(True, 5, "STA - WPA_SUPPLICANT")),
-    6: stepInfo("Generate traffic and observe IV reuse", 6, "Click to generate traffic using arping. Check the traffic in wireshark: you should be seeing the\nInitialization Vector be reset to 1 after every reassociation request", None, None, None, True, "Generate traffic", generateTraffic),
+    6: stepInfo("Generate traffic and observe IV reuse", 6, "Click to generate traffic using arping. Check the traffic in wireshark: you should be seeing the\nPacket Number (Initialization Vector) be reset to 1 after every reassociation request", None, None, None, True, "Generate traffic", generateTraffic),
 }
 
 actionDictionary: dict[int,bool] = {
@@ -158,11 +158,11 @@ def stepLoader(*args):
     stepToLoad=currentStep.get()
     clear()
     if stepToLoad==0:
-        extWindow("FT handshake\nattack simulation",''' ''',"Start the wizard",next)
+        extWindow("FT handshake\nattack simulation",'''Follow the explaination and this guide to do the exercise''',"Start the wizard",next)
     elif stepToLoad<=6:
         explanationWindow(stepDictionary[stepToLoad])
     else:
-        extWindow("The End","Thank you for using our simulation. \n Click the button to close everything.","Close",exit)
+        extWindow("The End","Thank you for using our simulation. \n Click the button to close (almost) everything.","Close",exit)
 
 currentStep.trace_add("write",stepLoader)
 
