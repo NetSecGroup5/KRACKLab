@@ -23,6 +23,7 @@ class ClientSocket:
         self._msgcount = 0
         self._installed_nonce = 1
         self._state = CState.SEARCHING
+        self._deass = False
 
         log(f"IP: {addr}", DEBUG)
         log(f"PORT: {port}\n\n", DEBUG)
@@ -60,6 +61,7 @@ class ClientSocket:
                     self._state = CState.READY
                 
                 case DassMSG() if self._state is CState.INSTALLED:
+                    if addr == ('127.0.0.1', 6000) : self._deass = True # if i recive from the MitM
                     log("Disassociating...\n",WATCH)
                     msg = CloseMSG("Connection terminated by Client")
                     self.__send_msg(msg)
@@ -86,7 +88,7 @@ class ClientSocket:
         self._repl = -1
         self._msgcount = 0
         msg = AssMSG()
-        if self.__check_udp_port('127.0.0.1', 6000) != False:
+        if self._deass:
             self._dst = ['127.0.0.1', 6000] # in order to fake mitm at the beginning
             self.__send_msg(msg)
         else:
@@ -114,23 +116,6 @@ class ClientSocket:
     def __generate_nonce(self,empty):
         characters = string.ascii_letters + string.digits
         return ''.join(random.choice(characters) if empty else "0" for i in range(16))
-
-    def __check_udp_port(self, ip, port, timeout=2):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.settimeout(timeout)
-        try:
-            sock.sendto(b'', (ip, port))
-            _, _ = sock.recvfrom(1024)
-            return True # Open (Received Response)
-        except socket.timeout:
-            return None # Open | Filtered (No Response)   
-        except ConnectionResetError:
-            return False # Closed (ICMP Unreachable)
-        except Exception as e:
-            log(f"Error: {e}",ERROR)
-            return False
-        finally:
-            sock.close()
     
 CLIENT_LISTEN_TIME = 20
 
