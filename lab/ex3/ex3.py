@@ -243,7 +243,7 @@ def explanationWindow(step: stepInfo):
 
     tk.Button(text="Previous", command=previous).place(width=btnWidth, height=btnHeight,x=10,y=btnY)
     if(step.hasCommand and step.commandBtnName and step.buttonCommand):
-        if ((step.step!=2 and step.step!=3) is True):
+        if ((step.step!=1 and step.step!=4) is True):
             exeBtn=tk.Button(text=step.commandBtnName, command=step.buttonCommand)
             exeBtn.place(width=btnWidth,height=btnHeight,x=(winWidth-btnWidth)/2,y=btnY)
         elif (actionDictionary[step.step] is False):
