@@ -115,8 +115,6 @@ def main():
         log("Sending dissociation  frame to Client...\n")
         M.send_dass()
 
-        M.receive() # eat the test frame sent by client
-
         log("Waiting for association frame to Client...\n")
         M.receive() # wait for association frame
         M.send() # send for association frame
