@@ -165,11 +165,11 @@
   #align(center)[
     #grid(
       columns: (30%,5%,30%,5%,30%),
-      [*K $xor$ K $xor$ P' $xor$ P*], [$arrow.r.filled$], [*0 $xor$ P' $xor$ P*], [$arrow.r.filled$], [*P' $xor$ P*]
+      [*K $xor$ K $xor$ P' $xor$ P*], [$arrow.r.filled$], [*0 $xor$ P' $xor$ P*], [$arrow.r.filled$], [*C $xor$ C'* = *P' $xor$ P*]
     )
   ]
 
-  If *P* and *P'* are two common network packets, *they will both contain frames of common protocols* (like TCP, for example), which are *highly predictable*. Therefore, since it is possible to easily guess correctly at least a portion of, for example, *P'*, such knowledge can be used to perform the operation *P' $xor$ P*, which will output at least a portion of the content of *P*.
+  If *P* and *P'* are two common network packets, *they will both contain frames of common protocols* (like TCP, for example), which are *highly predictable*. Therefore, since it is possible to easily guess correctly at least a portion of, for example, *P'*, such knowledge can be used to perform the operation *P' $xor$ C $xor$ C'*, which will output at least a portion of the content of *P*.
 
   The *Key Reinstallation Attack cause* a reinstallation of the PTK and, consequently, *a reset of the packet number* used in the *IV* of *CCMP*: based on what was just discussed, a simple *capture of packets* before and after the re-installation *is sufficient* to be able *to decrypt at least a portion of one of them*: given the normal web traffic, nowadays over HTTPS, this will not make possible to decrypt the payload of the majority of packets, but it is still a *very important vulnerability if HTTP is used*, potentially breaking both *confidentiality* and *integrity* of the *packets*.
 

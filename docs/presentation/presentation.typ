@@ -339,7 +339,7 @@
             #align(center)[*But* *0 $xor$ P'* = *P'*]
             #align(center)[$arrow.b.filled$]
             #align(center)[
-              Remains *P' $xor$ P*
+              Remains *C $xor$ C'* = *P' $xor$ P* $arrow.r.filled$ *P* = *C $xor$ C' $xor$ P'*
             ]
           ]
         ],
@@ -386,7 +386,7 @@
             #align(center)[*But* *0 $xor$ P'* = *P'*]
             #align(center)[$arrow.b.filled$]
             #align(center)[
-              Remains *P' $xor$ P*
+              Remains *C $xor$ C'* = *P' $xor$ P* $arrow.r.filled$ *P* = *C $xor$ C' $xor$ P'*
             ]
             #align(center)[$arrow.b.filled$]
             #align(center)[
@@ -437,7 +437,7 @@
             #align(center)[*But* *0 $xor$ P'* = *P'*]
             #align(center)[$arrow.b.filled$]
             #align(center)[
-              Remains *P' $xor$ P*
+              Remains *C $xor$ C'* = *P' $xor$ P* $arrow.r.filled$ *P* = *C $xor$ C' $xor$ P'*
             ]
             #align(center)[$arrow.b.filled$]
             #align(center)[
