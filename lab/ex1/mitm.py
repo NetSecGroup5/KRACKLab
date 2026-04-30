@@ -18,7 +18,7 @@ class MitMSocket():
     def __init__(self,addr,port):
         self._m = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._m.bind((addr, port))
-        self._dst = []
+        self._dst = ()
         self._current_msg = None
         self._reply_msgs = []
         self._state = MStates.IDLE
@@ -105,7 +105,7 @@ class MitMSocket():
     
     def __send_msg(self, msg):
         serialized_msg = pickle.dumps(msg)
-        self._m.sendto(serialized_msg, (self._dst[0], self._dst[1]))
+        self._m.sendto(serialized_msg, self._dst)
 
 def main():
     print_mitm()

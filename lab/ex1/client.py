@@ -18,7 +18,7 @@ class ClientSocket:
     def __init__(self, addr,port):
         self._c = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._c.bind((addr, port))
-        self._dst = []
+        self._dst = ()
         self._repl = -1
         self._msgcount = 0
         self._installed_nonce = 1
@@ -89,10 +89,10 @@ class ClientSocket:
         self._msgcount = 0
         msg = AssMSG()
         if self._deass:
-            self._dst = ['127.0.0.1', 6000] # in order to fake mitm at the beginning
+            self._dst = ('127.0.0.1', 6000) # in order to fake mitm at the beginning
             self.__send_msg(msg)
         else:
-            self._dst = ['127.0.0.1', 5001]
+            self._dst = ('127.0.0.1', 5001)
             self.__send_msg(msg)
     
     def get_state(self):
@@ -111,7 +111,7 @@ class ClientSocket:
     
     def __send_msg(self, msg):
         serialized_msg = pickle.dumps(msg)
-        self._c.sendto(serialized_msg, (self._dst[0], self._dst[1]))
+        self._c.sendto(serialized_msg, self._dst)
 
     def __generate_nonce(self,empty):
         characters = string.ascii_letters + string.digits

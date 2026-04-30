@@ -18,7 +18,7 @@ class APSocket:
     def __init__(self, addr,port):
         self._ap = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._ap.bind((addr, port))
-        self._dst = []
+        self._dst = ()
         self._repl = -1
         self._msgcount = 0
         self._state = APState.IDLE
@@ -98,7 +98,7 @@ class APSocket:
 
     def __send_msg(self, msg):
         serialized_msg = pickle.dumps(msg)
-        self._ap.sendto(serialized_msg, (self._dst[0], self._dst[1]))
+        self._ap.sendto(serialized_msg, self._dst)
     
     def __generate_nonce(self,empty):
         characters = string.ascii_letters + string.digits
