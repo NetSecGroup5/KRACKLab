@@ -53,7 +53,7 @@
       - *TKIP* used *RC4* as a stream cipher $arrow$ *no longer safe* (*RC4 NOMORE* vulnerability);
       - *CCMP* use *AES* in *CCM* mode.
 
-      CCMP: *keystream* with *various elements* together in the *Initializator Vector (IV)*.
+      CCMP: *keystream* with *various elements* together in the *Initialization Vector (IV)*.
 
       #align(center)[$arrow.b.filled$]
 
@@ -339,7 +339,7 @@
             #align(center)[*But* *0 $xor$ P'* = *P'*]
             #align(center)[$arrow.b.filled$]
             #align(center)[
-              Remains *P' $xor$ P*
+              Remains *C $xor$ C'* = *P' $xor$ P* $arrow.r.filled$ *P* = *C $xor$ C' $xor$ P'*
             ]
           ]
         ],
@@ -386,7 +386,7 @@
             #align(center)[*But* *0 $xor$ P'* = *P'*]
             #align(center)[$arrow.b.filled$]
             #align(center)[
-              Remains *P' $xor$ P*
+              Remains *C $xor$ C'* = *P' $xor$ P* $arrow.r.filled$ *P* = *C $xor$ C' $xor$ P'*
             ]
             #align(center)[$arrow.b.filled$]
             #align(center)[
@@ -437,7 +437,7 @@
             #align(center)[*But* *0 $xor$ P'* = *P'*]
             #align(center)[$arrow.b.filled$]
             #align(center)[
-              Remains *P' $xor$ P*
+              Remains *C $xor$ C'* = *P' $xor$ P* $arrow.r.filled$ *P* = *C $xor$ C' $xor$ P'*
             ]
             #align(center)[$arrow.b.filled$]
             #align(center)[
