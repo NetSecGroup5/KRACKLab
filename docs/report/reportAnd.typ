@@ -1,11 +1,55 @@
-#import "../lib/common.typ": authors, course, labNumber, vulnName
-#import "../lib/commonReport.typ": docBody, firstPage, indexPage
+#import "../lib/common.typ": *
+#import "../lib/commonReport.typ": firstPage, indexPage
 
 #firstPage("Laboratory " + labNumber, authors.andrea)
 
 #pagebreak()
 
-#indexPage()
+#indexPage(tableList: false)
+
+#let docBody(body, title) = {
+  show figure: set block(breakable: true)
+  show link: it => underline(text(fill: linkColor)[#it])
+  show ref: rf => underline(text(fill: mainColor)[#rf])
+
+  set heading(numbering: "1.")
+
+  show heading.where(level: 1): h => {
+    set text(size: 1.5em)
+    h
+    v(0.25em)
+  }
+
+  set page(
+    margin: (top: 70pt, bottom: 60pt, right: 30pt, left: 30pt),
+    header: [
+
+      #grid(
+        columns: (33%, 33%, 33%),
+        align: (x, y) => {
+          if x == 0 {
+            left + horizon
+          } else if x == 1 {
+            center + horizon
+          } else {
+            right + horizon
+          }
+        },
+        [#title], [The #vulnName vulnerability], [#date],
+      )
+
+      #line(length: 100%)
+
+
+    ],
+    footer: [
+      #align(center)[#context [#counter(page).display("1 of 1", both: true)]] \
+      #place(dx: -71pt, dy: -2pt)[#rect(height: 50%, width: 135%, stroke: none, fill: mainColor)]
+    ],
+  )
+
+  body
+}
 
 #docBody(
   [
@@ -15,11 +59,6 @@
     The transition to WPA/WPA2 introduced stronger encryption methods to protect against unauthorized access and data interception:
     - *WPA (First Iteration)*: Introduced TKIP (Temporal Key Integrity Protocol), which dynamically changed encryption keys to prevent the types of "key cracking" that plagued WEP.
     - *WPA2 (Second Iteration)*: Standardized the use of AES (Advanced Encryption Standard), a government-grade encryption algorithm that provides significantly higher security and performance.
-    Unlike their predecessor, WPA and WPA2 offer two distinct modes of operation tailored to different environments:
-    - *Personal Mode (WPA-PSK)*: Designed for home users, this mode relies on a Pre-Shared Key (PSK).
-    - *Enterprise Mode (WPA-802.1X)*: Built for high-security environments like offices.
-
-    The process is more complex, beginning with the authentication of devices seeking network access through a cryptographic key exchange and derivation process. Furthermore, *the keys used for each type of packet type are distinct*, generated through a specific and sophisticated key derivation process.
 
     The process begins with a *Pre-Shared Key (PSK)*, which must be known by both parties.
     Next, the PSK and SSID are processed through another function to create the *Pairwise Master Key (PMK)*. During the 4-way handshake, this PMK, AP and Client nonces and the AP MAC are used to derive the *Pairwise Transient Key (PTK)*.
@@ -31,7 +70,7 @@
     == EAPOL
     It is a network communication protocol *used in both wired and wireless environments* to provide a framework for authenticating devices and controlling their access to network infrastructure. While it is more *extensively utilized in Enterprise Mode, it is still essential in Personal Mode* to facilitate a secure key exchange during the handshake and to ensure the port remains closed until authentication is successfully completed.
 
-    During the 4-Way Handshake, before any actual data transfer occurs, the client and the Access Point exchange EAPOL messages carrying all the necessary parameters required to complete the key derivation process.
+    During the 4-Way Handshake, the client and the Access Point exchange EAPOL messages carrying all the necessary parameters required to complete the key derivation process.
     These frames can be very complex but we only care on a few of them:
     #figure(
       image("img/And/EAPOL.png", width: 60%),
@@ -46,30 +85,32 @@
 
     = Key Reinstallation Attack
     == WPA/WPA2 Handshake <handshake>
-    The handshake is one of the primary processes within the protocol and is the crucial element in ensuring the security of wireless connections. Generally, this process involves exchanging information between a client device and a Wi-Fi access point to establish a secure connection and authenticate both parties.
-    Specifically, the WPA2 4-way handshake is a cryptographic procedure triggered when a client device attempts to authenticate and connect to an access point. This process consists of four messages exchanged between the client and the AP, designed to verify the authenticity of the client’s credentials and to derive a cryptographically secure session key for all subsequent communication.
-    The primary similarity between WPA and WPA2 during this initial phase is the *Client Authentication Request* where the client sends a connection request to join the network, and the *Access Point Response* that includes the parameters necessary for authentication.
-    The part of out interest is the 4-way handshake
-    #figure(
-      image("img/And/4way.png", width: 60%),
-      caption: [4-way handshake by Mathy Vanhoef@krackattackpaper],
+    #grid(
+      rows: 1,
+      columns: 2,
+      column-gutter: 5pt,
+      align: horizon,
+      [#set par(justify: true)
+        The handshake is one of the primary processes within the protocol and is the *crucial element* in ensuring the security of wireless connections. Generally, this process involves *exchanging information* between a client device and a Wi-Fi access point to establish a secure connection and authenticate both parties.
+        Specifically, the WPA2 4-way handshake is a cryptographic procedure triggered when a client device attempts to authenticate and connect to an access point. This process consists of *four messages* exchanged between the client and the AP, designed to verify the authenticity of the client’s credentials and to derive a cryptographically secure session key for all subsequent communication.
+        The primary similarity between WPA and WPA2 during this initial phase is the *Client Authentication Request* where the client sends a connection request to join the network, and the *Access Point Response* that includes the parameters necessary for authentication.
+        The part of out interest is the 4-way handshake],
+      figure(
+        image("img/And/4way.png", width: 100%),
+        caption: [4-way handshake by Mathy Vanhoef@krackattackpaper],
+      ),
     )
     - *Message 1 — ANonce Transmission*: The AP generates a random value called the ANonce and sends it to the client along with the Replay Counter. Upon receiving this, the client can derive the PTK because it now possesses all required components: the PMK, its own SNonce, the AP’s ANonce, and both MAC addresses.
     - *Message 2 — SNonce and MIC*: The client responds to the AP with its own random value, the SNonce, the Replay Counter, and a MIC. The AP uses the SNonce to calculate the PTK on its side and verifies the received MIC against its own calculation to authenticate the client.'
     - *Message 3 — GTK and Key Installation*: The AP sends an updated Replay Counter, a key installation request, a MIC, and the Group Transient Key (GTK) for broadcast traffic. This is the specific stage where the RSC is included to inform the client of the starting packet number for the new key. Upon receiving the client verifies the MIC to authenticate the AP. If it matches, the client installs the PTK and GTK
     - *Message 4 — Confirmation*: A final EAPOL-Key message (ACK) to confirm the keys are in place. Once the AP receives this confirmation, it also installs the keys, completing the handshake and enabling secure data transmission.
 
-    == Exploit the handshake (KRACK Attack)
+    == Exploit the handshake
     The problem in this handshake implementation stems from the fact that the state machine which determines exactly when and how keys are installed was never detailed with sufficient precision. Specifically, the original WPA2 specifications did not account for the client's behavior upon receiving Message 3.
     Currently, the client *installs the PTK simply by verifying that the MIC is correct and the Replay Counter is valid*. If all is well, it sends Message 4. However, if an attacker intercepts and blocks Message 4, the Access Point will retransmit Message 3. The client will then reinstall the same key without triggering any warnings or alarms.
     This reinstallation resets the packet number and the nonces/values (such as the CCMP IV) used for data packet encryption. With predictable nonces, an attacker who has captured the necessary handshake data can potentially decrypt packets sent from the client to the access point. A similar vulnerability exists regarding GTK updates and can also be leveraged against the Access Point during a Fast BSS Transition (handshake used for device roaming).
 
     The fact that the standard did not specify the exact timing for key installation or the precise method for testing the replay counter led to *various implementations of the protocol*. Consequently, while the logic remains similar across devices, not all are equally vulnerable to this attack.
-    Here i leave a brief scheme of the most used implementation and how they are vulnerable to this attack:
-    #figure(
-      image("img/And/where.png", width: 50%),
-      caption: [Vulnerable implementations by Mathy Vanhoef@krackattackpaper],
-    )
 
     = Laboratory
     == Exercise 1 (Attack simulation)
@@ -85,77 +126,101 @@
 
     === Execution
     By executing the start.sh script, multiple terminal windows will open, each impersonating a specific network entity.
-    #figure(
-      image("img/And/E0-0.png", width: 60%),
-      caption: [Initial view],
-    )
-    By pressing Enter on the AP terminal, it will begin listening for connection requests. To observe a standard 4-way handshake, we will first press Enter on the client terminal while ignoring the MITM.
-    This initiates a connection request from the client to the AP, prompting the AP to start the handshake. By following the normal protocol flow described earlier, a secure connection is established. Once complete, the client will begin sending encrypted messages that the AP can successfully decrypt.
-    #figure(
-      image("img/And/E0-1.png", width: 60%),
-      caption: [Completed legal handshake],
-    )
-    After this, we can attempt the attack. By pressing Enter on the client, it will begin listening for new messages for 20 seconds. While it is listening, you can start the MitM script by pressing Enter in its respective terminal.
-    The MitM script sends a deauthentication message to the client, forcing it to disconnect from the original AP. The client will then begin searching for available networks again. Because the MitM script is now impersonating the legitimate AP, the client will attempt to associate with the attacker’s terminal instead.
-    #figure(
-      image("img/And/E0-2.png", width: 60%),
-      caption: [Start the attack with man in the middle],
-    )
-    Now, we relay the association message to the real AP and associate the MitM with it as well. This establishes the MitM's position, allowing us to relay all messages back and forth between the client and the legitimate AP.
-    Once associated, we follow the normal protocol flow until Message 4. At this point, the MitM will intercept and save Message 4 rather than relaying it to the real AP. The same logic applies to any subsequent encrypted messages, which are held by the attacker instead of being passed through.
-    #figure(
-      image("img/And/E0-3.png", width: 60%),
-      caption: [Block message 4],
-    )
-    After a timeout, the real AP will attempt to retransmit Message 3. We then put the client back into listening mode so it receives this retransmitted message as if it were part of a normal exchange.
-    When the client receives this second Message 3, it reinstalls the keys (resetting the nonce) and generates a second Message 4. At this point, the Man-in-the-Middle intercepts and drops this second Message 4, as it is no longer useful and would likely be rejected by the AP anyway. Instead, the MitM sends the original, stored Message 4 and the previously captured encrypted messages to the real AP. This allows the AP to finally install the keys and decrypt the data packets.
-    #figure(
-      image("img/And/E0-4.png", width: 60%),
-      caption: [Completed attack],
-    )
-    Because the client has reinstalled the keys, the real Access Point now receives two separate data messages encrypted with the same nonce used. This confirmed reuse of the nonce proves that the client's cryptographic state was reset, allowing the attacker to potentially decrypt packets sent from the client to the access point.
 
+    By pressing Enter on the AP terminal, it will begin listening for connection requests. To observe a standard 4-way handshake, press also Enter on the client terminal while ignoring the MITM.
+    This initiates a connection request from the client to the AP, prompting the AP to start the handshake. Once complete, the client will begin sending encrypted messages that the AP can successfully decrypt.
+    #grid(
+      rows: 1,
+      columns: 2,
+      figure(
+        image("img/And/E0-0.png", width: 80%),
+        caption: [Initial view],
+      ),
+      figure(
+        image("img/And/E0-1.png", width: 80%),
+        caption: [Completed legal handshake],
+      ),
+    )
+    To execute the attack, press Enter on the client to start its 20-second listening window, then launch the MitM script.
+    The script sends a deauthentication message, forcing the client to disconnect and reconnect to the attacker’s impersonated AP. The MitM then relays these association messages to the real AP, positioning itself as a transparent bridge for all traffic.
+    Once the connection is established, follow the standard protocol until Message 4. Instead of relaying it, the MitM intercepts and saves Message 4, along with any subsequent encrypted messages, effectively cutting off the legitimate AP.
+    #grid(
+      rows: 1,
+      columns: 2,
+      figure(
+        image("img/And/E0-2.png", width: 80%),
+        caption: [Start the attack with man in the middle],
+      ),
+      figure(
+        image("img/And/E0-3.png", width: 80%),
+        caption: [Block message 4 with MitM],
+      ),
+    )
+    Once the real AP times out and retransmits Message 3, put the client back into listening mode to receive it.
+
+    The client will then reinstall the keys (resetting the nonce) and generate a new Message 4. The MitM intercepts and drops this second Message 4 because it would be rejected by the AP anyway. Instead, the MitM sends the original Message 4 and the captured encrypted data to the real AP, allowing it to finally install the keys and decrypt the traffic.
+    #grid(
+      rows: 1,
+      columns: 2,
+      column-gutter: 5pt,
+      [#set par(justify: true)
+        Because the client has reinstalled the keys, the real Access Point now receives two separate data messages encrypted with the same nonce used. This confirmed reuse of the nonce proves that the client's cryptographic state was reset, allowing the attacker to potentially decrypt packets sent from the client to the access point.],
+      figure(
+        image("img/And/E0-4.png", width: 80%),
+        caption: [Completed attack],
+      ),
+    )
 
     == Exercise 4 (Hardware demo)
     The final exercise is a practical *demonstration* rather than a traditional lab, as it involves replicating the attack using real hardware to establish a channel-based MitM position.
-    We will observe how earlier versions of Android, specifically those prior to version 6.0, are particularly vulnerable to the KRACK attack. This hardware-based setup illustrates the real-world impact of the vulnerability on legacy mobile devices.
+    We will observe how earlier versions of Android, specifically those* prior to version 6.0*, are particularly vulnerable to the KRACK attack.
 
     === Environment
     In order to recreate the attack we used:
-    - *Real AP*: an old D-Link router (last firmware update - 2016/7)
+    - *Real AP*: An old d-Link router (last firmware update - 2016/7)
     - *MitM*: Raspberry PI 4 running Kali for Raspberry PI 2026.1
       - *Rouge AP*: External Wi-Fi adapter (Nintendo Wi-Fi Connection Adapter with other drivers)
+      - *MitM (replay client)*: Internal Wi-Fi adapter
     - *Client*: WUAWEI MediaPad T1 7.0 running Android 4.4.2 JellyBean
 
-    Executing this attack is a delicate process—not because of the scripts themselves, as we can use the original scripts@script provided by the paper author, but because setting up the environment is particularly challenging and the setup requires *TWO separate Wi-Fi adapters*.
-    In our case, because we used non-standard external adapters, we had to "patch" and install specific drivers. This was necessary because the default system drivers for that adapter were not designed for the specialized tasks required for this attack.
-    In theory, configuring the MitM involves disabling the NetworkManager service and running the script while specifying which interfaces will act as the Rogue AP and which will connect to the Real AP.
-    In practice, this is highly hardware-dependent since perform the attack, you need a configuration that supports:
-    - *Two Managed* interfaces
-    - *One Monitor Mode* interface
-    - *One AP Mode* interface
-    All of these are created by the script but many Wi-Fi adapters have hardware limitations that prevent them from supporting these modes simultaneously. For example, some cannot create multiple virtual interfaces, while others cannot maintain an active AP mode while a Monitor interface is running.
-    Fortunately, the adapters we used support the necessary modes, though we still had to carefully adjust the order of interface creation, due to hardware limitation explained before, to make the script work as intended.
-    // image of init_interfaces.sh
+    Executing the attack is delicate—not due to the scripts themselves, which are provided by the paper’s author, but because the environment is difficult to configure.
+
+    The setup requires two separate Wi-Fi adapters. Since we used non-standard external hardware, we had to manually patch and install specific drivers. In theory to configure the MitM, you must disable the NetworkManager service and run the script, specifying which interface acts as the Rogue AP and which connects to the Real AP.
+    In practice, this is highly hardware-dependent since perform the attack, you need a configuration that supports: *Two Managed* interfaces, *One Monitor Mode* interface and *One AP Mode* interface
+    All of these are created by the script but *many Wi-Fi adapters have hardware limitations* that prevent them from supporting these modes simultaneously. For example, some cannot create multiple virtual interfaces, while others cannot maintain an active AP mode while a Monitor interface is running.
+    #grid(
+      rows: 1,
+      columns: 2,
+      column-gutter: 5pt,
+      [#set par(justify: true)
+        Fortunately, the adapters we used support the necessary modes, though we still had to carefully adjust the order of interface creation, due to hardware limitation explained before, to make the script work as intended.],
+      figure(image("img/And/interfaces.jpg", width: 70%), caption: [Interface configuration]),
+    )
 
     === Execution
     Once the environment is configured, the client connects to the real AP as usual. We then execute the "krack-all-zero-tk.py" script, which listens for Beacon frames across all channels. As soon as it identifies the target AP, one interface connects to it to establish a bridge.
     Simultaneously, the script uses a *modified version of hostapd* to create a Rogue AP. This Rogue AP is set to a different channel, ideally far enough away to avoid signal interference, but *clones the SSID, MAC address, and WPA settings* of the legitimate AP.
-    // image of script execution
     With both "sides" of the bridge ready, the process unfolds as follows:
     + *Forced Reconnection*: One adapter sends a deauthentication frame to the client. If the client is physically closer to the Rogue AP (or perceives a stronger signal), it will automatically attempt to associate with it.
     + *The MitM Bridge*: At this point, the script sits directly between the client and the real AP.
     + *Automated Handshake Manipulation*: The execution flow follows the same logic as our previous Python exercise. The script automatically intercepts Message 4, waits for the AP to retransmit Message 3, and forces the key reinstallation.
-    // image of script alert
+
     In the case of Android 6.0 devices, this reinstallation doesn't just reset the nonce, it triggers a bug that installs an *all-zero encryption key (TK)*, making the subsequent traffic trivial to decrypt.
 
     === Results
     Now, opening Wireshark and filtering for Data frames provides that the client will reuse the CCMP IV value, hence is vulnerable to the attack. This visual confirmation in the packet logs effectively bridges the gap between the theoretical protocol flaw and a successful real-world exploit.
-    // Wireshark image
+    #grid(
+      rows: 1,
+      columns: 2,
+      column-gutter: 10pt,
+      figure(image("img/And/reuse.jpg", width: 100%), caption: [IV reuse detected by the script]),
+      figure(image("img/And/wire.jpg", width: 100%), caption: [IV reuse shown on Wireshark]),
+    )
+    In our specific test environment, *the router was modern enough to reject Message 4* because it contained an outdated replay counter. As a result, while *we successfully forced the client to reinstall the key* (proving the client-side vulnerability), the *Access Point refused to finalize the handshake*. This prevented the client from fully connecting to the network.
+    However, as the author of the KRACK paper@krackattackpaper pointed out, *many Access Points* at the time of the discovery *were not as strict*. Those legacy devices would readily *accept Message 4 even with an old replay counter*. While our current hardware prevented us from completing the full connection, the successful key reinstallation on the client demonstrates that with an older, less secure AP, a complete and successful exploit *would be entirely possible*.
 
-    In our specific test environment, the router was modern enough to reject Message 4 because it contained an outdated replay counter. As a result, while we successfully forced the client to reinstall the key (proving the client-side vulnerability), the Access Point refused to finalize the handshake. This prevented the client from fully connecting to the network.
-    However, as the author of the KRACK paper@krackattackpaper pointed out, many Access Points at the time of the discovery were not as strict. Those legacy devices would readily accept Message 4 even with an old replay counter. While our current hardware prevented us from completing the full connection, the successful key reinstallation on the client demonstrates that with an older, less secure AP, a complete and successful exploit would be entirely possible.
-
+    #pagebreak()
+    #set heading(numbering: none)
     = Artificial Intelligence Usage Declaration and additional information
     == Usage of AI
     During the editing of this document, I have used Artificial Intelligence (AI) based tools in order to improve the clarity of the text after the content was already written.
@@ -167,6 +232,7 @@
     The information regarding the vulnerability and the possible consequences have been obtained from the published paper@krackattackpaper and the official website@krackattackwebsite of the vulnerability.
     In order to recreate the attack in a virtual environment, essential was the documentation found in the KRACK test scripts repository@script.
 
+    #pagebreak()
     #bibliography("sitography/Mtt/reportMttSit.yml", title: "Sitography")
   ],
   "Laboratory " + labNumber,
