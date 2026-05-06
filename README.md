@@ -1,18 +1,22 @@
 <h1 align="center">4th laboratory of the Network Security course @ UniTn: understanding the KRACK attacks</h1>
 <div align="center">
-    <img width="150px" src="https://github.com/NetSecGroup5/KRACKLab/blob/main/docs/images/firstPage/KRACK-logo-small.png?raw=true">
+    <img width="170px" src="https://github.com/NetSecGroup5/KRACKLab/blob/main/docs/images/firstPage/KRACK-logo-small.png?raw=true">
 </div>
 <p align="center"><b>K</b>ey <b>R</b>einstallation <b>A</b>tta<b>ck</b>s</p>
 
-Cover image: KRACK vulnerability logo by Mathy Vanhoef <br>
-Mathy Vanhoef, CC BY-SA 4.0, via Wikimedia Commons. File available at: https://www.krackattacks.com/images/logo.png
+<p align="center">
+    Cover image: KRACK vulnerability logo by Mathy Vanhoef <br>
+    Mathy Vanhoef, CC BY-SA 4.0, via Wikimedia Commons. File available at: https://www.krackattacks.com/images/logo.png
+</p>
 
 This repository is NOT OFFICIAL and NOT RELATED with the researchers who discovered and analyzed the KRACK vulnerabilities
 
 ## Table of contents
 - [Introduction](#introduction)
 - [Setup guides](#setup-guides)
+  - [Exercise 1](#exercise-1)
   - [Exercise 2](#exercise-2)
+  - [Exercise 3](#exercise-3)
 
 # Introduction
 
@@ -21,6 +25,13 @@ This repository contains all the files, reports and procedure that were used dur
 > Reproduction of the step explained can and will expose the machine in which they are replicated to very harmful vulnerability. We discourage you to proceed, especially if YOU DON'T FULLY UNDERSTAND WHAT YOU ARE ABOUT TO DO. This guide is meant to be for research purposes ONLY.
 
 # Setup guides
+
+## Exercise 1
+> [!NOTE]
+> The behavior of this exercise could differ between Windows and Linux machines due to different behavior in socket management
+> Don't start the midm until the client successfully performed a complete handshake with the Access Point and its state is "Listening"
+
+The first exercise of the laboratory consisted in a guided simulation of the KRACK attack. This exerise does not require a particular setup: running the shell script ```start.sh``` will activate the three python scripts automatically.
 
 ## Exercise 2
 
@@ -106,3 +117,7 @@ This repository contains all the files, reports and procedure that were used dur
   ```
   sudo python3 ex2.py
   ```
+
+## Exercise 3
+> [!CAUTION]
+> Usage of the computer after following the guide is VEHEMENTLY ADVISED AGAINST. It is STRONGLY SUGGESTED to use a Virtual Machine and disable all connectivity. DO NOT PROCEED IF YOU DON'T FULLY UNDERSTAND WHAT YOU ARE DOING: the machine will be exposed to various vulnerability. All recommendation of Exercise 2 still apply.
